@@ -9,6 +9,7 @@
 ![Flutter](https://img.shields.io/badge/Flutter-3.35+-02569B?logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-3.9+-0175C2?logo=dart&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Kotlin-SMBJ-7F52FF?logo=kotlin&logoColor=white)
+[![Android APK](https://github.com/batatinhafcbatatinha-pixel/SMB-UI/actions/workflows/android.yml/badge.svg)](https://github.com/batatinhafcbatatinha-pixel/SMB-UI/actions/workflows/android.yml)
 ![Platform](https://img.shields.io/badge/plataforma-Android-3DDC84?logo=android&logoColor=white)
 
 </div>
@@ -47,6 +48,10 @@
                                    ▼
                           Servidor SMB (Windows / Samba / NAS)
 ```
+
+## Download
+
+Baixe o APK mais recente em [Releases](https://github.com/batatinhafcbatatinha-pixel/SMB-UI/releases/latest). Builds de cada commit ficam disponíveis como artefato na aba [Actions](https://github.com/batatinhafcbatatinha-pixel/SMB-UI/actions/workflows/android.yml).
 
 ## Começando
 
