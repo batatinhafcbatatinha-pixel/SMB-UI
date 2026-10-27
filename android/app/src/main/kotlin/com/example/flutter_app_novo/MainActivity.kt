@@ -246,19 +246,32 @@ class MainActivity : FlutterActivity() {
                 "discoverNetwork" -> {
                     executor.execute {
                         try {
-                            val devices = listOf(Pair("Meu PC", "192.168.15.13"))
-                            val out = ArrayList<Map<String, String>>()
-                            for (device in devices) {
-                                // Only report hosts that actually accept SMB connections.
-                                val reachable = try {
-                                    java.net.Socket().use { s ->
-                                        s.connect(java.net.InetSocketAddress(device.second, 445), 800)
+                            // Scan the device's local /24 subnet for hosts accepting SMB (port 445).
+                            val localIp = java.net.NetworkInterface.getNetworkInterfaces().toList()
+                                .filter { it.isUp && !it.isLoopback }
+                                .flatMap { it.inetAddresses.toList() }
+                                .filterIsInstance<java.net.Inet4Address>()
+                                .firstOrNull { it.isSiteLocalAddress }
+                            val out = java.util.Collections.synchronizedList(ArrayList<Map<String, String>>())
+                            if (localIp != null) {
+                                val prefix = localIp.hostAddress!!.substringBeforeLast('.')
+                                val pool = java.util.concurrent.Executors.newFixedThreadPool(32)
+                                for (i in 1..254) {
+                                    val ip = "$prefix.$i"
+                                    if (ip == localIp.hostAddress) continue
+                                    pool.execute {
+                                        try {
+                                            java.net.Socket().use { s ->
+                                                s.connect(java.net.InetSocketAddress(ip, 445), 400)
+                                            }
+                                            out.add(mapOf("name" to ip, "ip" to ip))
+                                        } catch (_: Exception) {}
                                     }
-                                    true
-                                } catch (_: Exception) { false }
-                                if (reachable) out.add(mapOf("name" to device.first, "ip" to device.second))
+                                }
+                                pool.shutdown()
+                                pool.awaitTermination(15, java.util.concurrent.TimeUnit.SECONDS)
                             }
-                            result.success(out)
+                            result.success(out.sortedBy { it["ip"]!!.substringAfterLast('.').toInt() })
                         } catch (e: Exception) {
                             Log.e("SMB_PLUGIN", "Network discovery error", e)
                             result.error("DISCOVERY_ERROR", e.message, null)
