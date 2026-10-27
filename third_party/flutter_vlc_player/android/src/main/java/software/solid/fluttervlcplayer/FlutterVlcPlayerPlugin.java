@@ -1,0 +1,87 @@
+package software.solid.fluttervlcplayer;
+
+import android.os.Build;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+
+import io.flutter.FlutterInjector;
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
+
+public class FlutterVlcPlayerPlugin implements FlutterPlugin, ActivityAware {
+
+    private static FlutterVlcPlayerFactory flutterVlcPlayerFactory;
+    private FlutterPluginBinding flutterPluginBinding;
+
+    private static final String VIEW_TYPE = "flutter_video_plugin/getVideoView";
+
+    public FlutterVlcPlayerPlugin() {
+    }
+
+        // v1 embedding `registerWith` removed to compile against newer Flutter SDKs.
+        // The plugin uses the Android v2 embedding via FlutterPlugin and ActivityAware.
+
+    @Override
+    public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+        flutterPluginBinding = binding;
+    }
+
+    @Override
+    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+        flutterPluginBinding = null;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+        if (flutterVlcPlayerFactory == null) {
+            final FlutterInjector injector = FlutterInjector.instance();
+            //
+            flutterVlcPlayerFactory =
+                    new FlutterVlcPlayerFactory(
+                            flutterPluginBinding.getBinaryMessenger(),
+                            flutterPluginBinding.getTextureRegistry(),
+                            injector.flutterLoader()::getLookupKeyForAsset,
+                            injector.flutterLoader()::getLookupKeyForAsset
+                    );
+            flutterPluginBinding
+                    .getPlatformViewRegistry()
+                    .registerViewFactory(
+                            VIEW_TYPE,
+                            flutterVlcPlayerFactory
+                    );
+            //
+        }
+        startListening();
+    }
+
+    @Override
+    public void onDetachedFromActivityForConfigChanges() {
+        onDetachedFromActivity();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
+        onAttachedToActivity(binding);
+    }
+
+    @Override
+    public void onDetachedFromActivity() {
+        stopListening();
+    }
+
+    // extra methods
+
+    private static void startListening() {
+        if (flutterVlcPlayerFactory != null)
+            flutterVlcPlayerFactory.startListening();
+    }
+
+    private static void stopListening() {
+        if (flutterVlcPlayerFactory != null)
+            flutterVlcPlayerFactory.stopListening();
+    }
+}

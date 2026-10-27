@@ -12,7 +12,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  flutter_vlc_player: ^6.0.0
+  flutter_vlc_player:
+    path: third_party/flutter_vlc_player
   image: ^4.7.1
   video_thumbnail: ^0.5.0
   shared_preferences: ^2.0.15
