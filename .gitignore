@@ -1,0 +1,204 @@
+flutter/ephemeral/
+**/dgph
+*.mode1v3
+*.mode2v3
+*.moved-aside
+*.pbxuser
+*.perspectivev3
+**/*sync/
+.sconsign.dblite
+.tags*
+**/.vagrant/
+**/DerivedData/
+Icon?
+**/Pods/
+**/.symlinks/
+profile
+xcuserdata
+**/.generated/
+Flutter/App.framework
+Flutter/Flutter.framework
+Flutter/Flutter.podspec
+Flutter/Generated.xcconfig
+Flutter/ephemeral/
+Flutter/app.flx
+Flutter/app.zip
+Flutter/flutter_assets/
+Flutter/flutter_export_environment.sh
+ServiceDefinitions.json
+Runner/GeneratedPluginRegistrant.*
+
+# Exceptions to above rules.
+!default.mode1v3
+!default.mode2v3
+!default.pbxuser
+!default.perspectivev3
+
+
+# Visual Studio user-specific files.
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio build-related files.
+x64/
+x86/
+
+# Visual Studio cache files
+# files ending in .cache can be ignored
+*.[Cc]ache
+# but keep track of directories ending in .cache
+!*.[Cc]ache/
+
+
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.swp
+*.swo
+*~
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IDE & Editor
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.code-workspace
+
+# Python related
+__pycache__/
+*.egg-info/
+dist/
+build/
+.Python
+env/
+venv/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.env
+.env.local
+.env.*.local
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio
+/android/app/debug
+/android/app/profile
+/android/app/release
+/android/local.properties
+/android/.gradle/
+/android/app/.gradle/
+.android/
+*.apk
+*.aab
+
+# iOS/macOS
+**/ios/**/*.mode1v3
+**/ios/**/*.mode2v3
+**/ios/**/*.moved-aside
+**/ios/**/*.pbxuser
+**/ios/**/*.perspectivev3
+**/ios/**/*sync/
+**/ios/**/.sconsign.dblite
+**/ios/**/.tags*
+**/ios/**/.vscode/*
+**/ios/**/flutter/Flutter.framework
+**/ios/**/flutter/Flutter.podspec
+**/ios/**/Flutter/Flutter.modulemap
+**/ios/Flutter/flutter_export_environment.sh
+**/macos/Flutter/Flutter.framework
+**/macos/Flutter/Flutter.podspec
+**/macos/Flutter/GeneratedPluginRegistrant.*
+**/macos/*.app/
+
+# Linux
+/linux/flutter/ephemeral/
+/linux/build/
+
+# Windows
+/windows/flutter/ephemeral/
+/windows/build/
+
+# Web
+/web/packages/
+
+# Compilation related
+*.o
+*.a
+*.lib
+*.o.d
+
+# OS generated
+Thumbs.db
+.DS_Store
+.Spotlight-V100
+.Trashes
+
+# Buildozer/Kivy (if used)
+.buildozer/
+bin/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+.#*
+
+# Execution and Debug Logs
+flutter_logs.md
+android/.kotlin/
+
+
+# Local logs, analysis dumps and debug captures (may contain private paths)
+analyze_output.txt
+*.log
+LOG.MD
+LOG.md
+ERROS.md
+*_logs.md
+
+# Local tooling
+.claude/
+.flutter-plugins-dependencies

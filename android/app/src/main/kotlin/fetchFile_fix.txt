@@ -1,0 +1,21 @@
+                            var smPath = path.replace("/", "\\")
+                            if (!smPath.startsWith("\\")) smPath = "\\" + smPath
+
+                            // Open file with correct parameters
+                            val smbFile = share.open(smPath, java.util.EnumSet.of(com.hierynomus.msfscc.FileAttributes.FILE_ATTRIBUTE_NORMAL), null, null, null, null)
+                            val inputStream = smbFile.inputStream
+                            
+                            val localFile = File(cacheDir, "temp_" + File(path).name)
+                            val output = FileOutputStream(localFile)
+
+                            val buffer = ByteArray(8192)
+                            var bytesRead: Int
+                            while (inputStream.read(buffer).also { bytesRead = it } > 0) {
+                                output.write(buffer, 0, bytesRead)
+                            }
+
+                            inputStream.close()
+                            output.close()
+                            smbFile.close()
+
+                            result.success(localFile.absolutePath)

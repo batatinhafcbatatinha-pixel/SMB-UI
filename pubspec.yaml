@@ -1,0 +1,38 @@
+name: smb_media_viewer
+description: SMB Media Viewer migrated to Flutter with native Android SMB support (Kotlin + SMBJ)
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: ">=3.9.0 <4.0.0"
+  flutter: ">=3.35.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  flutter_vlc_player: ^6.0.0
+  image: ^4.7.1
+  video_thumbnail: ^0.5.0
+  shared_preferences: ^2.0.15
+  crop_your_image: ^2.0.0
+  video_trimmer: ^5.0.0
+  path_provider: ^2.0.15
+  sensors_plus: ^6.0.1
+  vector_math: ^2.1.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter:
+  uses-material-design: true
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: assets/logo_smb_media.png
+  min_sdk_android: 21
