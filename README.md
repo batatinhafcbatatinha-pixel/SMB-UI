@@ -15,20 +15,20 @@
 
 ---
 
-## ✨ Recursos
+## Recursos
 
 | | |
 |---|---|
-| 📂 **Navegação SMB nativa** | Lista compartilhamentos e pastas via [SMBJ](https://github.com/hierynomus/smbj) no lado Android, com cache e atualização incremental. |
-| 🎬 **Streaming de vídeo** | Proxy HTTP local que lê o arquivo em blocos do servidor e entrega ao player (VLC) com suporte a *seek*, sem baixar o vídeo inteiro. |
-| 🖼️ **Miniaturas rápidas** | Geração paralela de thumbnails de imagens e vídeos, com cache em memória e em disco. |
-| 🔎 **Busca e filtros** | Busca por nome tolerante a acentos, filtros por tipo e ordenação por nome, data ou tamanho — lembrados por pasta. |
-| ✂️ **Edição leve** | Recorte de imagens e corte de vídeos, salvando como cópia ou substituindo o original no servidor. |
-| 🗂️ **Gerenciamento de arquivos** | Seleção múltipla para copiar, mover, excluir e enviar arquivos. |
-| 👆 **Gestos** | Zoom, arrastar e deslizar entre mídias no visualizador. |
-| 🌐 **Idiomas** | Interface em português e inglês. |
+| **Navegação SMB nativa** | Lista compartilhamentos e pastas via [SMBJ](https://github.com/hierynomus/smbj) no lado Android, com cache e atualização incremental. |
+| **Streaming de vídeo** | Proxy HTTP local que lê o arquivo em blocos do servidor e entrega ao player (VLC) com suporte a *seek*, sem baixar o vídeo inteiro. |
+| **Miniaturas rápidas** | Geração paralela de thumbnails de imagens e vídeos, com cache em memória e em disco. |
+| **Busca e filtros** | Busca por nome tolerante a acentos, filtros por tipo e ordenação por nome, data ou tamanho — lembrados por pasta. |
+| **Edição leve** | Recorte de imagens e corte de vídeos, salvando como cópia ou substituindo o original no servidor. |
+| **Gerenciamento de arquivos** | Seleção múltipla para copiar, mover, excluir e enviar arquivos. |
+| **Gestos** | Zoom, arrastar e deslizar entre mídias no visualizador. |
+| **Idiomas** | Interface em português e inglês. |
 
-## 🏗️ Arquitetura
+## Arquitetura
 
 ```
 ┌──────────────────────────── Flutter (Dart) ────────────────────────────┐
@@ -45,10 +45,10 @@
 │                                  ▼  SMBJ                               │
 └──────────────────────────────────┼─────────────────────────────────────┘
                                    ▼
-                          🖥️  Servidor SMB (Windows / Samba / NAS)
+                          Servidor SMB (Windows / Samba / NAS)
 ```
 
-## 🚀 Começando
+## Começando
 
 ### Pré-requisitos
 
@@ -77,7 +77,7 @@ No Windows também há atalhos que detectam o dispositivo automaticamente:
 flutter build apk --release
 ```
 
-## 🧪 Testes
+## Testes
 
 ```bash
 flutter test
@@ -85,7 +85,7 @@ flutter test
 
 Os testes cobrem navegação e atualização de pastas, busca, filtros em pastas grandes, preferências de visualização, cache em memória, leitura de duração de MP4, o proxy de vídeo e os gestos do visualizador.
 
-## 📁 Estrutura
+## Estrutura
 
 ```
 lib/
@@ -98,7 +98,3 @@ android/                       # Plugin SMB nativo (Kotlin + SMBJ)
 test/                          # Testes de widget e unidade
 tool/                          # Benchmark SMB e runner com logs
 ```
-
-## 🤝 Contribuindo
-
-Issues e pull requests são bem-vindos. Antes de abrir um PR, rode `flutter analyze` e `flutter test`.
