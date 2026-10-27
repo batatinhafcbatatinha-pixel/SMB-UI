@@ -15,6 +15,14 @@ subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
+// Older plugins (e.g. flutter_vlc_player) don't declare a namespace, which AGP 8 requires.
+subprojects {
+    plugins.withId("com.android.library") {
+        extensions.configure<com.android.build.gradle.LibraryExtension> {
+            if (namespace == null) namespace = project.group.toString()
+        }
+    }
+}
 subprojects {
     project.evaluationDependsOn(":app")
 }
