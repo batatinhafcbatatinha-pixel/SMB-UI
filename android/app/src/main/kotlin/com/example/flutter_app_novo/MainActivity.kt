@@ -239,44 +239,92 @@ class MainActivity : FlutterActivity() {
         // no-op: using fresh connections, no pool to prune
     }
 
+    /**
+     * Scan the local LAN (/24 around this device's Wi-Fi/Ethernet address) for hosts
+     * accepting SMB on port 445. Sockets are bound to the LAN network so Android does
+     * not route them over mobile data when Wi-Fi has no internet.
+     */
+    private fun discoverSmbHosts(): List<Map<String, String>> {
+        var localIp: java.net.Inet4Address? = null
+        var socketFactory: javax.net.SocketFactory? = null
+
+        val cm = getSystemService(android.content.Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager
+        if (cm != null) {
+            @Suppress("DEPRECATION")
+            for (network in cm.allNetworks) {
+                val caps = cm.getNetworkCapabilities(network) ?: continue
+                val isLan = caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) ||
+                    caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_ETHERNET)
+                if (!isLan) continue
+                val addr = cm.getLinkProperties(network)?.linkAddresses
+                    ?.map { it.address }
+                    ?.filterIsInstance<java.net.Inet4Address>()
+                    ?.firstOrNull { it.isSiteLocalAddress } ?: continue
+                localIp = addr
+                socketFactory = network.socketFactory
+                break
+            }
+        }
+
+        if (localIp == null) {
+            // Fallback: prefer Wi-Fi/Ethernet interfaces over mobile data (rmnet/ccmni) or VPN (tun).
+            val candidates = NetworkInterface.getNetworkInterfaces().toList()
+                .filter { it.isUp && !it.isLoopback && !it.isVirtual }
+                .sortedBy { iface ->
+                    val n = iface.name.lowercase()
+                    when {
+                        n.startsWith("wlan") || n.startsWith("eth") -> 0
+                        n.startsWith("rmnet") || n.startsWith("ccmni") || n.startsWith("tun") -> 2
+                        else -> 1
+                    }
+                }
+            localIp = candidates.asSequence()
+                .flatMap { it.inetAddresses.toList().asSequence() }
+                .filterIsInstance<java.net.Inet4Address>()
+                .firstOrNull { it.isSiteLocalAddress }
+        }
+
+        val self = localIp?.hostAddress ?: run {
+            Log.w("SMB_PLUGIN", "Discovery: no local IPv4 LAN address found")
+            return emptyList()
+        }
+        val prefix = self.substringBeforeLast('.')
+        Log.i("SMB_PLUGIN", "Discovery: scanning $prefix.0/24 (self=$self, bound=${socketFactory != null})")
+
+        val out = Collections.synchronizedList(ArrayList<Map<String, String>>())
+        val pool = Executors.newFixedThreadPool(48)
+        for (i in 1..254) {
+            val ip = "$prefix.$i"
+            if (ip == self) continue
+            pool.execute {
+                try {
+                    val socket = socketFactory?.createSocket() ?: java.net.Socket()
+                    socket.use { it.connect(java.net.InetSocketAddress(ip, 445), 700) }
+                    out.add(mapOf("name" to ip, "ip" to ip))
+                } catch (_: Exception) {}
+            }
+        }
+        pool.shutdown()
+        if (!pool.awaitTermination(20, TimeUnit.SECONDS)) pool.shutdownNow()
+        Log.i("SMB_PLUGIN", "Discovery: found ${out.size} SMB host(s)")
+        return synchronized(out) { out.sortedBy { it["ip"]!!.substringAfterLast('.').toInt() } }
+    }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
                 "discoverNetwork" -> {
-                    executor.execute {
+                    // Own thread: the shared SMB executor may be busy with a long listing/fetch.
+                    Thread {
                         try {
-                            // Scan the device's local /24 subnet for hosts accepting SMB (port 445).
-                            val localIp = java.net.NetworkInterface.getNetworkInterfaces().toList()
-                                .filter { it.isUp && !it.isLoopback }
-                                .flatMap { it.inetAddresses.toList() }
-                                .filterIsInstance<java.net.Inet4Address>()
-                                .firstOrNull { it.isSiteLocalAddress }
-                            val out = java.util.Collections.synchronizedList(ArrayList<Map<String, String>>())
-                            if (localIp != null) {
-                                val prefix = localIp.hostAddress!!.substringBeforeLast('.')
-                                val pool = java.util.concurrent.Executors.newFixedThreadPool(32)
-                                for (i in 1..254) {
-                                    val ip = "$prefix.$i"
-                                    if (ip == localIp.hostAddress) continue
-                                    pool.execute {
-                                        try {
-                                            java.net.Socket().use { s ->
-                                                s.connect(java.net.InetSocketAddress(ip, 445), 400)
-                                            }
-                                            out.add(mapOf("name" to ip, "ip" to ip))
-                                        } catch (_: Exception) {}
-                                    }
-                                }
-                                pool.shutdown()
-                                pool.awaitTermination(15, java.util.concurrent.TimeUnit.SECONDS)
-                            }
-                            result.success(out.sortedBy { it["ip"]!!.substringAfterLast('.').toInt() })
+                            val found = discoverSmbHosts()
+                            runOnUiThread { result.success(found) }
                         } catch (e: Exception) {
                             Log.e("SMB_PLUGIN", "Network discovery error", e)
-                            result.error("DISCOVERY_ERROR", e.message, null)
+                            runOnUiThread { result.error("DISCOVERY_ERROR", e.message, null) }
                         }
-                    }
+                    }.start()
                 }
 
                 "listShares" -> {
