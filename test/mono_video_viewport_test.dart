@@ -76,4 +76,31 @@ void main() {
       expect(find.byType(Slider), findsOneWidget);
     },
   );
+  testWidgets(
+    'normal mode fills the viewport and does not resize when aspect arrives',
+    (tester) async {
+      // The VLC surface takes seconds to adapt after a resize, so the player
+      // must keep one size while the video's real aspect ratio is discovered.
+      Widget viewer(double aspect) => MaterialApp(
+        home: Scaffold(
+          body: MonoVideoViewport(
+            enabled: false,
+            sourceAspectRatio: aspect,
+            showControls: false,
+            onInteraction: () {},
+            child: const ColoredBox(
+              key: ValueKey('player'),
+              color: Colors.blue,
+            ),
+          ),
+        ),
+      );
+      final player = find.byKey(const ValueKey('player'));
+      await tester.pumpWidget(viewer(1.0)); // size not known yet
+      final viewport = tester.getSize(find.byType(MonoVideoViewport));
+      expect(tester.getSize(player), viewport);
+      await tester.pumpWidget(viewer(9 / 16)); // portrait video reported
+      expect(tester.getSize(player), viewport);
+    },
+  );
 }

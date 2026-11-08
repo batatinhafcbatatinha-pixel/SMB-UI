@@ -46,11 +46,14 @@ class _MonoVideoViewportState extends State<MonoVideoViewport> {
           : 1.0;
       final rows = widget.enabled && layout == EyeLayout.overUnder ? 2.0 : 1.0;
       final eyeAspect = sourceAspect * rows / columns;
-      final baseHeight = widget.enabled
-          ? math.max(bounds.maxHeight, bounds.maxWidth / eyeAspect)
-          : math.min(bounds.maxHeight, bounds.maxWidth / eyeAspect);
-      final height = baseHeight * (widget.enabled ? _zoom : 1);
-      final width = height * eyeAspect;
+      // Normal mode: the player always fills the viewport and VLC letterboxes
+      // the frame itself. Sizing it to the video's aspect made the native
+      // surface resize once the size became known (seconds after opening),
+      // and VLC showed a small, then squeezed, picture until it caught up.
+      final height = widget.enabled
+          ? math.max(bounds.maxHeight, bounds.maxWidth / eyeAspect) * _zoom
+          : bounds.maxHeight;
+      final width = widget.enabled ? height * eyeAspect : bounds.maxWidth;
       final maxX = math.max(0.0, (width - bounds.maxWidth) / 2);
       final maxY = math.max(0.0, (height - bounds.maxHeight) / 2);
       _pan = widget.enabled

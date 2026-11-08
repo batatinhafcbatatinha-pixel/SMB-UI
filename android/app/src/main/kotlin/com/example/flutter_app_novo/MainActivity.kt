@@ -86,22 +86,31 @@ class MainActivity : FlutterActivity() {
      * Get a valid connection from pool or create a new one.
      * This method checks if the cached connection is still alive before returning it.
      */
-    private fun getOrCreateConnection(ip: String): Pair<Connection, Session> {
-        val connection = smbClient.connect(ip)
-        val session = connection.authenticate(
-            AuthenticationContext("smbuser", "5723".toCharArray(), "")
-        )
-        connectionCreationCounter.incrementAndGet()
-        return Pair(connection, session)
-    }
+    private fun getOrCreateConnection(ip: String): Pair<Connection, Session> = createFreshConnection(ip)
 
+    // SMBClient.connect() hands back its pooled Connection for the host. If the socket
+    // died while the app was in background, that Connection still reports isConnected
+    // and every authenticate() fails with "Broken pipe". Force-closing it removes it
+    // from SMBJ's pool, so the retry opens a new TCP connection.
     private fun createFreshConnection(ip: String): Pair<Connection, Session> {
         val connection = smbClient.connect(ip)
-        val session = connection.authenticate(
-            AuthenticationContext("smbuser", "5723".toCharArray(), "")
-        )
+        val session = try {
+            authenticate(connection)
+        } catch (e: Exception) {
+            if (e is com.hierynomus.mssmb2.SMBApiException) throw e // e.g. bad credentials
+            Log.w("SMB_PLUGIN", "Pooled connection to $ip is dead, reconnecting: ${e.message}")
+            forceClose(connection)
+            authenticate(smbClient.connect(ip))
+        }
         connectionCreationCounter.incrementAndGet()
-        return Pair(connection, session)
+        return Pair(session.connection, session)
+    }
+
+    private fun authenticate(connection: Connection): Session =
+        connection.authenticate(AuthenticationContext("smbuser", "5723".toCharArray(), ""))
+
+    private fun forceClose(connection: Connection) {
+        try { connection.close(true) } catch (_: Exception) { }
     }
 
     private class ShareHandle(val key: String, val session: Session, val share: DiskShare)
@@ -223,6 +232,9 @@ class MainActivity : FlutterActivity() {
                 (e is com.hierynomus.mssmb2.SMBApiException && handle.share.isConnected)
             if (!keepSession) {
                 invalidateHandle(handle)
+                // Transport failure: drop the pooled connection too, or the next
+                // acquireHandle() would get the same dead socket back.
+                if (e !is com.hierynomus.mssmb2.SMBApiException) forceClose(handle.session.connection)
             }
             throw e
         }
