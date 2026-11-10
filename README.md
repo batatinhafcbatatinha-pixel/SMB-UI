@@ -4,36 +4,36 @@
 
 # SMB Media Viewer
 
-**Navegue, assista e organize fotos e vídeos direto do seu compartilhamento de rede (SMB) — sem baixar nada antes.**
+**Browse, watch, and organize photos and videos straight from your network share (SMB) — without downloading anything first.**
 
 ![Flutter](https://img.shields.io/badge/Flutter-3.35+-02569B?logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-3.9+-0175C2?logo=dart&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Kotlin-SMBJ-7F52FF?logo=kotlin&logoColor=white)
 [![Android APK](https://github.com/batatinhafcbatatinha-pixel/SMB-UI/actions/workflows/android.yml/badge.svg)](https://github.com/batatinhafcbatatinha-pixel/SMB-UI/actions/workflows/android.yml)
-![Platform](https://img.shields.io/badge/plataforma-Android-3DDC84?logo=android&logoColor=white)
+![Platform](https://img.shields.io/badge/platform-Android-3DDC84?logo=android&logoColor=white)
 
 </div>
 
 ---
 
-## Recursos
+## Features
 
 | | |
 |---|---|
-| **Navegação SMB nativa** | Lista compartilhamentos e pastas via [SMBJ](https://github.com/hierynomus/smbj) no lado Android, com cache e atualização incremental. |
-| **Streaming de vídeo** | Proxy HTTP local que lê o arquivo em blocos do servidor e entrega ao player (VLC) com suporte a *seek*, sem baixar o vídeo inteiro. |
-| **Miniaturas rápidas** | Geração paralela de thumbnails de imagens e vídeos, com cache em memória e em disco. |
-| **Busca e filtros** | Busca por nome tolerante a acentos, filtros por tipo e ordenação por nome, data ou tamanho — lembrados por pasta. |
-| **Edição leve** | Recorte de imagens e corte de vídeos, salvando como cópia ou substituindo o original no servidor. |
-| **Gerenciamento de arquivos** | Seleção múltipla para copiar, mover, excluir e enviar arquivos. |
-| **Gestos** | Zoom, arrastar e deslizar entre mídias no visualizador. |
-| **Idiomas** | Interface em português e inglês. |
+| **Native SMB browsing** | Lists shares and folders through [SMBJ](https://github.com/hierynomus/smbj) on the Android side, with caching and incremental refresh. |
+| **Video streaming** | A local HTTP proxy reads the file in chunks from the server and feeds it to the player (VLC) with seek support, without downloading the whole video. |
+| **Fast thumbnails** | Parallel thumbnail generation for images and videos, with in-memory and on-disk caches. |
+| **Search and filters** | Accent-insensitive name search, type filters, and sorting by name, date, or size — remembered per folder. |
+| **Light editing** | Crop images and trim videos, saving as a copy or replacing the original on the server. |
+| **File management** | Multi-select to copy, move, delete, and upload files. |
+| **Gestures** | Zoom, pan, and swipe between media in the viewer. |
+| **Languages** | Interface in Portuguese and English. |
 
-## Arquitetura
+## Architecture
 
 ```
 ┌──────────────────────────── Flutter (Dart) ────────────────────────────┐
-│  main.dart ─ telas (servidores, pastas, visualizador)                  │
+│  main.dart ─ screens (servers, folders, viewer)                        │
 │  utils/smb_client.dart ───────────┐                                    │
 │  utils/parallel_thumbnail_loader  │ MethodChannel                      │
 │  utils/smb_video_proxy_server ────┼──► http://127.0.0.1 ──► VLC player │
@@ -46,22 +46,22 @@
 │                                  ▼  SMBJ                               │
 └──────────────────────────────────┼─────────────────────────────────────┘
                                    ▼
-                          Servidor SMB (Windows / Samba / NAS)
+                          SMB server (Windows / Samba / NAS)
 ```
 
 ## Download
 
-Baixe o APK mais recente em [Releases](https://github.com/batatinhafcbatatinha-pixel/SMB-UI/releases/latest). Builds de cada commit ficam disponíveis como artefato na aba [Actions](https://github.com/batatinhafcbatatinha-pixel/SMB-UI/actions/workflows/android.yml).
+Get the latest APK from [Releases](https://github.com/batatinhafcbatatinha-pixel/SMB-UI/releases/latest). Builds for every commit are available as artifacts in the [Actions](https://github.com/batatinhafcbatatinha-pixel/SMB-UI/actions/workflows/android.yml) tab.
 
-## Começando
+## Getting started
 
-### Pré-requisitos
+### Prerequisites
 
 - [Flutter](https://docs.flutter.dev/get-started/install) **3.35+** (Dart 3.9+)
-- Android SDK e um dispositivo ou emulador Android
-- Um compartilhamento SMB acessível na mesma rede
+- Android SDK and an Android device or emulator
+- An SMB share reachable on the same network
 
-### Rodando
+### Running
 
 ```bash
 git clone https://github.com/batatinhafcbatatinha-pixel/SMB-UI.git
@@ -70,36 +70,36 @@ flutter pub get
 flutter run
 ```
 
-No Windows também há atalhos que detectam o dispositivo automaticamente:
+On Windows there are also shortcuts that detect the device automatically:
 
 ```powershell
-./run_android.ps1      # ou run_android.bat
+./run_android.ps1      # or run_android.bat
 ```
 
-### Gerando o APK
+### Building the APK
 
 ```bash
 flutter build apk --release
 ```
 
-## Testes
+## Tests
 
 ```bash
 flutter test
 ```
 
-Os testes cobrem navegação e atualização de pastas, busca, filtros em pastas grandes, preferências de visualização, cache em memória, leitura de duração de MP4, o proxy de vídeo e os gestos do visualizador.
+The tests cover folder navigation and refresh, search, filters in large folders, view preferences, the in-memory cache, MP4 duration parsing, the video proxy, and the viewer gestures.
 
-## Estrutura
+## Project structure
 
 ```
 lib/
-├── main.dart                  # App, telas e visualizador de mídia
-├── image_editor.dart          # Recorte de imagens
-├── video_trimmer_screen.dart  # Corte de vídeos
-├── utils/                     # Cliente SMB, caches, thumbnails, proxy de vídeo
-└── widgets/                   # Viewport de vídeo e gestos
-android/                       # Plugin SMB nativo (Kotlin + SMBJ)
-test/                          # Testes de widget e unidade
-tool/                          # Benchmark SMB e runner com logs
+├── main.dart                  # App, screens, and media viewer
+├── image_editor.dart          # Image cropping
+├── video_trimmer_screen.dart  # Video trimming
+├── utils/                     # SMB client, caches, thumbnails, video proxy
+└── widgets/                   # Video viewport and gestures
+android/                       # Native SMB plugin (Kotlin + SMBJ)
+test/                          # Widget and unit tests
+tool/                          # SMB benchmark and log-capturing runner
 ```
